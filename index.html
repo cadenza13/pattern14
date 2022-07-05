@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>すごろくゲーム</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/destyle.css@3.0.2/destyle.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="title">
+    <h1><img src="img/LOGO.png" alt="ロゴ画像" width="300" height="100"></h1>
+    <button id="start-btn">GAME START</button>
+
+    <nav class="game-rule">
+      <ul>
+        <li>サイコロの目の数だけ進む、すごろくゲームです。</li>
+        <li>止まったマスに応じたイベントが発生します。</li>
+        <li>マップはランダムに生成されます。</li>
+        <li>キャラクターによる差異はありません。</li>
+        <li>バトルマスでは、サイコロを振って敵と戦います。 攻撃に成功するまでバトルは続けられます。</li>
+        <li>バトルで攻撃が失敗したり、トラップマスに止まるとLPが減少します。</li>
+        <li>回復マスではLPが1回復しますが、初期の数値を越えることはありません。</li>
+        <li>LPが0になるとゲームオーバーです。</li>
+      </ul>
+    </nav>
+  </div>
+
+  <div class="container hidden">
+    <div class="display">
+      <img id="monster" class="hidden" src="" alt="モンスター画像">
+      <img id="dice" src="img/dice01.png" alt="サイコロ画像">
+      <p id="event-text">ユーレイ君の冒険がスタートした！</p>
+    </div>
+
+    <div class="status">
+      <p id="life-point"></p>
+      <p id="map-length"></p>
+    </div>
+
+    <img id="chara" src="img/chara01-a.png" alt="キャラクター画像">
+    
+    <ul id="map">
+      <li>
+        <p>スタート</p>
+      </li>
+    </ul>
+    
+    <div class="btnes">
+      <button id="dice-btn">サイコロを振る</button>
+      <a href="index.html" id="title-btn">タイトルに戻る</a>
+    </div>
+  </div>
+  
+  <div class="result hidden">
+    <a href="#">Twitterでつぶやく</a>
+    <a href="index.html">タイトルに戻る</a>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
