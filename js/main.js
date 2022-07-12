@@ -83,14 +83,21 @@
   }
 
   class Chara{
-    constructor(){
+    constructor(num){
       this.images = [
-        'img/chara01-a.png',
-        'img/chara01-b.png',
-        'img/chara01-a.png',
-        'img/chara01-c.png',
-        'img/chara01-d.png',
-        'img/chara01-e.png',
+        `img/chara${num}-a.png`,
+        `img/chara${num}-b.png`,
+        `img/chara${num}-a.png`,
+        `img/chara${num}-c.png`,
+        `img/chara${num}-d.png`,
+        `img/chara${num}-e.png`,
+      ];
+
+      this.names = [
+        'ユーレイ君',
+        'エセ勇者',
+        'サウルス君',
+        'ポッポー',
       ];
 
       for(let i = 0; i < this.images.length; i++){
@@ -103,8 +110,12 @@
       this.imageNumber = 0;
       this.moveNumber = 0;
       this.lifePoint = 5;
+      this.name = this.names[num];
 
+      this.image.src = this.images[0];
       this.lifeDisplay.textContent = `LP : ${this.lifePoint}`;
+
+      event.startComment(this.name);
     }
 
     move(){
@@ -147,7 +158,7 @@
       if(this.lifePoint === 0){
         setTimeout(() =>{
           this.image.classList.add('down');
-          event.gameOver();
+          event.gameOver(this.name);
         }, 500);
       }
     }
@@ -159,19 +170,23 @@
       this.lengthDisplay = document.getElementById('map-length');
       this.moveNumber = 0;
       this.currentMove = 0;
-      this.mapLength = length + 1;
-      this.leftOver = length + 1;
+      this.mapLength = length;
+      this.leftOver = length;
 
       for(let i = 0; i < this.mapLength - 1; i++){
         const li = document.createElement('li');
-        const p = document.createElement('p');
-        const eventNumber = Math.floor(Math.random() * event.events.length);
+        const p = document.createElement('p');  
+        const eventNumber = Math.floor(Math.random() * event.normalEvents.length);
     
         li.appendChild(p);
         this.gameMap.appendChild(li);
     
-        p.textContent = event.events[eventNumber].text;
-        event.mapEvents.push(event.events[eventNumber].id);
+        if(hardSwitch){
+          p.textContent = event.hardEvents[eventNumber].text;
+        } else {
+          p.textContent = event.normalEvents[eventNumber].text;
+        }
+        event.eventPush(eventNumber);
       }
 
       this.lengthDisplay.textContent = `残り${this.leftOver}マス`;
@@ -232,16 +247,34 @@
 
   class Event{
     constructor(container){
-      this.events = [
+      this.normalEvents = [
+        {text: '1マス進む', id: 1},
         {text: '1マス進む', id: 1},
         {text: '2マス進む', id: 2},
         {text: '1マス戻る', id: 3},
         {text: '2マス戻る', id: 4},
         {text: 'トラップ', id: 5},
         {text: '回復', id: 6},
+        {text: '回復', id: 6},
+        {text: 'バトル', id: 7},
         {text: 'バトル', id: 7},
         {text: 'バトル', id: 8},
         {text: 'バトル', id: 9},
+      ];
+
+      this.hardEvents = [
+        {text: '1マス進む', id: 1},
+        {text: '2マス進む', id: 2},
+        {text: '1マス戻る', id: 3},
+        {text: '2マス戻る', id: 4},
+        {text: 'トラップ', id: 5},
+        {text: 'トラップ', id: 5},
+        {text: '回復', id: 6},
+        {text: 'バトル', id: 8},
+        {text: 'バトル', id: 9},
+        {text: 'バトル', id: 9},
+        {text: 'バトル', id: 10},
+        {text: 'バトル', id: 10},
       ];
 
       this.text = document.getElementById('event-text');
@@ -309,8 +342,15 @@
         case 9:
           this.encounter();
           setTimeout(() =>{
+            this.text.innerText = 'デュラハン\n5以上の目が出れば勝利!';
+            battle.encounter(2, 3);
+          }, 1000);
+          break;
+        case 10:
+          this.encounter();
+          setTimeout(() =>{
             this.text.innerText = 'オルトロス\n6以上の目が出れば勝利!';
-            battle.encounter(2, 4);
+            battle.encounter(3, 4);
           }, 1000);
           break;
       }
@@ -336,6 +376,10 @@
       this.battleSwitch = true;
     }
 
+    startComment(name){
+      this.text.innerText = `${name}の冒険が始まった!`;
+    }
+
     liveComment(result){
       switch(result){
         case 'winner':
@@ -358,11 +402,19 @@
       }, 1500);
     }
 
-    gameOver(){
-      this.text.innerText = 'ユーレイ君は力尽きた…。';
+    gameOver(name){
+      this.text.innerText = `${name}は力尽きた…。`;
       setTimeout(() =>{
         window.location = 'index.html';
       }, 2000);
+    }
+
+    eventPush(n){
+      if(hardSwitch){
+        this.mapEvents.push(this.hardEvents[n].id);
+      } else {
+        this.mapEvents.push(this.normalEvents[n].id);
+      }
     }
 
     clearSwitchChange(){
@@ -380,6 +432,7 @@
         'img/monster01.png',
         'img/monster02.png',
         'img/monster03.png',
+        'img/monster04.png',
       ];
 
       for(let i = 0; i < this.images.length; i++){
@@ -427,12 +480,58 @@
   }
 
   const title = document.querySelector('.title');
+  const select = document.querySelector('.select');
   const container = document.querySelector('.container');
-  const startBtn = document.getElementById('start-btn');
+  const lis = document.querySelectorAll('.select > ul > li');
+  const startBtnNormal = document.getElementById('start-btn-a');
+  const startBtnHard = document.getElementById('start-btn-b');
+  const selectBtn = document.getElementById('select-btn');
   const titleBtn = document.getElementById('title-btn');
 
-  startBtn.addEventListener('click', () =>{
+  let charaIndex = 0;
+  let hardSwitch = false;
+
+
+  function gameSelect(){
+    const inputs = document.querySelectorAll('input');
+
+    inputs.forEach(input =>{
+      if(input.checked){
+        map = new Map(input.value);
+      }
+    });
+    chara = new Chara(charaIndex);
+  }
+
+  function checkRemove(){
+    lis.forEach(li =>{
+      li.classList.remove('check');
+    });
+  }
+
+  lis.forEach((li, index) =>{
+    li.addEventListener('click', () =>{
+      checkRemove();
+      li.classList.add('check');
+      charaIndex = index;
+    });
+  });
+
+  startBtnNormal.addEventListener('click', () =>{
+    select.classList.add('show');
+    title.classList.add('thin');
+  });
+
+  startBtnHard.addEventListener('click', () =>{
+    select.classList.add('show');
+    title.classList.add('thin');
+    hardSwitch = true;
+  });
+
+  selectBtn.addEventListener('click', () =>{
+    gameSelect();
     title.classList.add('hidden');
+    select.classList.add('hidden');
     container.classList.remove('hidden');
   });
 
@@ -443,8 +542,8 @@
   });
 
   const dice = new Dice();
-  const chara = new Chara();
   const event = new Event(container);
-  const map = new Map(9);
   const battle = new Battle();
+  let chara;
+  let map;
 })();
